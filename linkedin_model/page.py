@@ -38,6 +38,18 @@ class Page(object):
         if(not self.session_owner):
             raise Exception("Operation not allowed: page isn't session owner")
 
+class EntityPage(Page):
+
+    def __init__(self, browser, page):
+        super(EntityPage, self).__init__(browser, page)
+
+    def initialize_content(self):
+        super(EntityPage, self).initialize_content()
+        self.entity = self.extract_entity()
+
+    def extract_entity(self):
+        pass
+
 class EntityAggregatorPage(Page):
 
     def __init__(self, browser, page):
@@ -46,15 +58,25 @@ class EntityAggregatorPage(Page):
     def initialize_content(self):
         super(EntityAggregatorPage, self).initialize_content()
         self.entity_service = EntityServices(self.browser.current_url)
-        self.entities = self.extract_entities()
+        self.entities_previews = self.extract_entities_previews()
 
+    def entity_type_to_ctor(self):
+        pass
 
-    def go_to_entity_page(self, preview, ctor):
-        if type(ctor) is type(EntityAggregatorPage):
-            self.get_preview_elements()[self.entities.index(preview)].find_element_by_class_name('entity-img').click()
-            return ctor(self.browser, self) #todo: check possibility for additional args*
+    def go_to_entity_page(self, preview):
+        entity_type = self.entity_service.get_entity_type()
+        ctor = self.entity_type_to_ctor()[entity_type]
+        self.vaildate_page_ctor(ctor, preview)
+        self.get_preview_elements()[self.entities_previews.index(preview)].find_element_by_class_name('entity-img').click()
+        return ctor(self.browser, self)
 
-    def extract_entities(self):
+    def vaildate_page_ctor(self, ctor, preview):
+        if ctor == None:
+            raise Exception('No constructor was given for preview: {}'.format(preview))
+        if type(ctor) is not type(EntityAggregatorPage):
+            raise Exception('Given constructor: {} for preview: {} is not of required type: EntityAggregatorPage '.format(ctor, preview))
+
+    def extract_entities_previews(self):
         self.validate_ownership()
         self.pre_process_elements()
         results_elements = self.get_preview_elements()
@@ -73,9 +95,20 @@ class EntityAggregatorPage(Page):
             EC.presence_of_element_located((By.ID, "results")))
             return element
 
+    def get_entities_iterator(self, previews_filter = None): #todo: implement as lazy iterator
+        filtered_previews = filter(previews_filter, self.entities_previews) if previews_filter != None else self.entities_previews
+        entities = []
+        for preview in filtered_previews:
+            entity_page = self.go_to_entity_page(preview)
+            entities.append(entity_page.entity)
+            entity_page.back()
+
+        return entities
+
+
 
 class RootPage(Page):
-    browser = webdriver.Firefox()
+    browser = webdriver.Firefox() #todo: enum to choose which browser to use
     def __init__(self, page=None):
         super(RootPage, self).__init__(self.browser, page)
 

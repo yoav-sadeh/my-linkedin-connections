@@ -15,11 +15,11 @@ class PeoplePage(EntityAggregatorPage):
     def pre_process_elements(self):
         self.validate_ownership()
         previews = self.get_results_container().find_elements_by_xpath('child::li')
-        for preview in previews:
+        for preview_element in previews:
             try:
-                preview.find_element_by_class_name('shared-conn-expando').click()
+                preview_element.find_element_by_class_name('shared-conn-expando').click()
             except Exception as e:
-                print 'preview {} does not have shared connections'.format(preview)
+                print '{} does not have shared connections with you.'.format(preview_element.find_element_by_class_name('main-headline').text)
 
 
 class PersonPage(EntityAggregatorPage):

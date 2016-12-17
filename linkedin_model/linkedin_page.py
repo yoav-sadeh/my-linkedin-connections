@@ -1,7 +1,7 @@
 __author__ = 'yoav'
 
 from entity_type import EntityType
-from search_results_page import SearchResultPage, SearchResultsPage
+from search_results_page import SearchResultsPage
 from page import RootPage
 import time
 
