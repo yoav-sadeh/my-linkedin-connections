@@ -42,4 +42,4 @@ finally:
 
 **Disclaimer:**
 
-This project is not by any meana production ready and is only a POC/proposition.
+This project is not by any means production ready and is only a POC/proposition.
