@@ -1,11 +1,6 @@
 __author__ = 'yoav'
 
-from selenium.webdriver.remote import webelement
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-
 
 #todo: try to remove and remove inheritance from children(is hash and eq method working?)
 class Preview(object):
@@ -17,7 +12,7 @@ class CompanyPreview(Preview):
     def __init__(self, element):
         super(CompanyPreview, self).__init__(element)
 
-        self.name = element.find_element_by_xpath('div/h3/a/b').text
+        self.name = element.find_element_by_xpath('div/h3').text
 
     def __eq__(self, other):
         return other.name == self.name

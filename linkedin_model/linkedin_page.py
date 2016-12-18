@@ -8,9 +8,8 @@ import time
 class LinkedInPage(RootPage):
 
     def __init__(self, mail, pwd):
-        super(LinkedInPage, self).__init__()
-        self.browser.get('http://linkedin.com')
-        self.browser.maximize_window()
+        super(LinkedInPage, self).__init__('http://linkedin.com')
+
         def login(mail, password):
             time.sleep(5)
 

@@ -1,6 +1,8 @@
 __author__ = 'yoav'
 
 from page import EntityAggregatorPage
+from linkedin_model.try_monad import Try
+
 
 class PeoplePage(EntityAggregatorPage):
 
@@ -15,11 +17,15 @@ class PeoplePage(EntityAggregatorPage):
     def pre_process_elements(self):
         self.validate_ownership()
         previews = self.get_results_container().find_elements_by_xpath('child::li')
+
         for preview_element in previews:
             try:
                 preview_element.find_element_by_class_name('shared-conn-expando').click()
             except Exception as e:
-                print '{} does not have shared connections with you.'.format(preview_element.find_element_by_class_name('main-headline').text)
+                tryLog = Try(lambda: self.logger.info('{} does not have shared connections with you.'.format(preview_element.find_element_by_class_name('main-headline').text)))
+                if tryLog.isFailure():
+                    self.logger.warn('Spotted bizzare preview element with text: {}'.format(preview_element.text.encode('ascii', 'ignore')))
+
 
 
 class PersonPage(EntityAggregatorPage):

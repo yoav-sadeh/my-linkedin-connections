@@ -2,11 +2,6 @@ __author__ = 'yoav'
 
 import time
 
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-
 from linkedin_model.company_page import CompanyPage
 from page import *
 from previews import *

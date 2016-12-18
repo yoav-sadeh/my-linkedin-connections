@@ -1,10 +1,7 @@
 __author__ = 'yoav'
 
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+from driver_services import DriverServices
+from logger_factory import get_logger
 
 import time
 from entity_services import EntityServices
@@ -13,6 +10,8 @@ class Page(object):
 
     session_owner = False
     def __init__(self, browser, page):
+        self.logger = get_logger(self)
+        self.logger.debug('entering page')
         self.browser = browser
         self.source_page = page
         self.take_page_over()
@@ -32,6 +31,7 @@ class Page(object):
             self.source_page.take_page_over()
 
     def close(self):
+
         self.browser.quit()
 
     def validate_ownership(self):
@@ -57,7 +57,7 @@ class EntityAggregatorPage(Page):
 
     def initialize_content(self):
         super(EntityAggregatorPage, self).initialize_content()
-        self.entity_service = EntityServices(self.browser.current_url)
+        self.entity_service = EntityServices(self.browser.current_url())
         self.entities_previews = self.extract_entities_previews()
 
     def entity_type_to_ctor(self):
@@ -80,8 +80,9 @@ class EntityAggregatorPage(Page):
         self.validate_ownership()
         self.pre_process_elements()
         results_elements = self.get_preview_elements()
-        mapped_results = dict(map(self.entity_service.map_results, results_elements))
-        return mapped_results.keys()
+        mapped_results = map(self.entity_service.map_results, results_elements)
+        previews = map(lambda t: t.value, filter(lambda p: p.isSuccess(), mapped_results))
+        return previews
 
     def get_preview_elements(self):
         results_elements = self.get_results_container().find_elements_by_xpath('child::li')
@@ -91,8 +92,7 @@ class EntityAggregatorPage(Page):
         pass
 
     def get_results_container(self):
-            element = WebDriverWait(self.browser, 5).until( #todo: move timeouts to config
-            EC.presence_of_element_located((By.ID, "results")))
+            element = self.browser.find_element_by_id('results')
             return element
 
     def get_entities_iterator(self, previews_filter = None): #todo: implement as lazy iterator
@@ -108,9 +108,9 @@ class EntityAggregatorPage(Page):
 
 
 class RootPage(Page):
-    browser = webdriver.Firefox() #todo: enum to choose which browser to use
-    def __init__(self, page=None):
-        super(RootPage, self).__init__(self.browser, page)
+    def __init__(self, initial_url):
+        browser = DriverServices(initial_url)
+        super(RootPage, self).__init__(browser, None)
 
 pages = set()
 
