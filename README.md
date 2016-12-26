@@ -49,4 +49,4 @@ def search_connections(company_name, company_site):
 
 **Disclaimer:**
 
-This project is not by any mean production ready and is only a POC/proposition.
+Currently, this project is not production ready.
