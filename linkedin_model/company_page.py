@@ -11,18 +11,6 @@ from linkedin_model.try_monad import Success, Failure
 
 class CompanyPage(EntityPage):
 
-    # #todo: remove redundent
-    # def back(self):
-    #     super(CompanyPage, self).back()
-
-
-    def __init__(self, browser, page):
-        super(CompanyPage, self).__init__(browser, page)
-        #self.browser = browser #todo: remove redundent
-
-    # def initialize_content(self):
-    #     super(CompanyPage, self).initialize_content()
-
     def extract_entity(self):
         view_more_bar = self.browser.try_get_element((By.CLASS_NAME, 'view-more-bar'))
 
@@ -33,7 +21,7 @@ class CompanyPage(EntityPage):
            company = view_more_bar.map(self.old_company)
 
         if company.isFailure():
-            raise Exception('could not extract company for the following reason: {}'.format(company.exception.message))
+            self.log_exception_and_quit('could not extract company for the following reason:', company.exception)
 
         return company.value
 
@@ -72,9 +60,7 @@ class CompanyPage(EntityPage):
             view_more_element.map(lambda e: self.browser.get(e.get_attribute('href')))
 
             if view_more_element.isFailure():
-                message = 'could not go to user page for the following reason: {}'.format(view_more_element.exception.message)
-                self.logger.error(message)
-                raise Exception(message)
+                self.log_exception_and_quit('could not go to user page for the following reason:', view_more_element.exception)
             #https://www.linkedin.com/vsearch/p?f_CC=1441
             return PeoplePage(self.browser, self)
 

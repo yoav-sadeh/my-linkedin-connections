@@ -10,8 +10,6 @@ from logger_factory import get_logger
 from config_factory import get_config
 
 class DriverServices(object):
-
-
     def __init__(self, initial_url):
         self.browser = webdriver.Firefox()#todo: enum to choose which browser to use
         self.browser.get(initial_url)
@@ -61,4 +59,38 @@ class DriverServices(object):
         result = Try(lambda: WebDriverWait(self.browser, self.timeout ).until(EC.presence_of_all_elements_located(by)))
         return result
 
+class ElementServices(object):
+    def __init__(self, element):
+        self.element = element
+        self.logger = get_logger(self)
+        self.config = get_config()
+        self.timeout = self.config.getint('DriverServices', 'timeout')
 
+    def find_element_by_xpath(self, xpath):
+        self.logger.debug('find_element_by_xpath: {}'.format(xpath))
+        return Try(lambda: self.element.find_element_by_xpath(xpath))
+
+
+    def find_element_by_id(self, id):
+        self.logger.debug('find_element_by_id: {}'.format(id))
+        return Try(lambda: self.element.find_element_by_id(id))
+
+    def find_element_by_class_name(self, class_name):
+        self.logger.debug('find_element_by_class_name: {}'.format(class_name))
+        return Try(lambda: self.element.find_element_by_class_name(class_name))
+
+
+    def find_elements_by_xpath(self, xpath):
+        self.logger.debug('find_elements_by_xpath: {}'.format(xpath))
+        return Try(lambda: self.element.find_elements_by_xpath(xpath))
+
+    def try_get_element(self, by):
+        self.logger.debug('try_get_element: {}'.format(by))
+
+        result = Try(lambda: self.element.find_element(by))
+        return result
+
+    def try_get_elements(self, by):
+        self.logger.debug('is_element_present: {}'.format(by))
+        result = Try(lambda: self.element.find_elements(by))
+        return result

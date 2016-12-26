@@ -4,10 +4,15 @@ from page import EntityAggregatorPage, EntityPage
 from linkedin_model.try_monad import Try
 
 
-class PeoplePage(EntityAggregatorPage):
+class JobsPage(EntityAggregatorPage):
+
+    def __init__(self, browser, page):
+        super(JobsPage, self).__init__(browser, page)
+
+        #self.people = self.extract_people() #todo:move all driver functions to a separate class for encapsulation and DRY
 
     def go_to_person_page(self, person_preview):
-        self.go_to_entity_page(person_preview, PersonPage)
+        self.go_to_entity_page(person_preview, JobPage)
 
     def pre_process_elements(self):
         self.validate_ownership()
@@ -23,7 +28,7 @@ class PeoplePage(EntityAggregatorPage):
 
 
 
-class PersonPage(EntityPage):
+class JobPage(EntityPage):
 
     def __init__(self, browser, page):
-        super(PersonPage, self).__init__(browser, page)
+        super(JobPage, self).__init__(browser, page)

@@ -22,7 +22,7 @@ class Page(object):
 
 
     def initialize_content(self):
-        pass
+        self.validate_ownership()
 
     def back(self):
         self.browser.back()
@@ -31,8 +31,11 @@ class Page(object):
             self.source_page.take_page_over()
 
     def close(self):
-
         self.browser.quit()
+
+    def log_exception_and_quit(self, msg, e):
+        self.logger.exception(msg, *e)
+        self.close()
 
     def validate_ownership(self):
         if(not self.session_owner):
@@ -64,6 +67,10 @@ class EntityAggregatorPage(Page):
         pass
 
     def go_to_entity_page(self, preview):
+
+        if preview not in self.entities_previews:
+            self.browser.quit()
+            raise EntityAggregatorPage.NoSuchPreview(preview)
         entity_type = self.entity_service.get_entity_type()
         ctor = self.entity_type_to_ctor()[entity_type]
         self.vaildate_page_ctor(ctor, preview)
@@ -105,6 +112,9 @@ class EntityAggregatorPage(Page):
 
         return entities
 
+    class NoSuchPreview(Exception):
+        def __init__(self, preview):
+            super(EntityAggregatorPage.NoSuchPreview, self).__init__('Preview {} does not exist in current page.'.format(preview))
 
 
 class RootPage(Page):
@@ -119,3 +129,4 @@ def owning_page(page):
     page.session_owner = True
     for p1 in [p for p in pages if p != page]:
         p1.session_owner = False
+

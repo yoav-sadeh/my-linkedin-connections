@@ -1,5 +1,6 @@
 __author__ = 'yoav'
 
+import inspect
 
 class Try(object):
     def __new__(self,operation):
@@ -31,7 +32,11 @@ class Success(TryLike):
 
     def map(self, operation):
         try:
-            success = operation(self.value)
+            arg_count = 2 if inspect.ismethod(operation) else 1
+            if operation.func_code.co_argcount == arg_count:
+                success = operation(self.value)
+            else:
+                success = operation()
             return Success(success)
         except Exception as e:
             return Failure(e)
